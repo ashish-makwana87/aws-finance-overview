@@ -8,11 +8,33 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: ap-south-1
+  environment:
+    MONGODB_URI: ${env:MONGODB_URI}
+    DB_NAME: ${env:DB_NAME}
+    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_EXP: ${env:JWT_EXP}
 
 functions:
   helloLambdaFn:
-    handler: hello.handler
+    handler: src/handlers/hello.handler
     events:
       - httpApi:
           path: /hello
           method: get
+
+  signupLambdaFn:
+    handler: src/handlers/auth/signup.handler
+    events:
+      - httpApi:
+          path: /auth/signup
+          method: post
+  
+  login:
+    handler: src/handlers/auth/login.handler
+    events:
+      - httpApi:
+          path: /auth/login
+          method: post
+
+plugins:
+  - serverless-dotenv-plugin
