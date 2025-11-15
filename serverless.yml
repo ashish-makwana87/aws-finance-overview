@@ -23,12 +23,12 @@ functions:
           method: get
 
   signupLambdaFn:
-    handler: src/handlers/auth/signup.handler
+    handler: src/handlers/auth/signUp.handler
     events:
       - httpApi:
           path: /auth/signup
           method: post
-  
+
   login:
     handler: src/handlers/auth/login.handler
     events:
