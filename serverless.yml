@@ -15,23 +15,12 @@ provider:
     JWT_EXP: ${env:JWT_EXP}
 
 functions:
-  helloLambdaFn:
-    handler: src/handlers/hello.handler
-    events:
-      - httpApi:
-          path: /hello
-          method: get
-
-  signupLambdaFn:
-    handler: src/handlers/auth/signUp.handler
+  apiLambda:
+    handler: src/api/handler.handler
     events:
       - httpApi:
           path: /auth/signup
           method: post
-
-  login:
-    handler: src/handlers/auth/login.handler
-    events:
       - httpApi:
           path: /auth/login
           method: post
