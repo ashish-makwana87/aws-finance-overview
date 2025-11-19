@@ -5,8 +5,8 @@ export const signupController = async (event) => {
  
   try {
     const body = JSON.parse(event.body);
-
     const result = await authService.signup(body.email, body.password);
+
     return success(result);
   } catch (err) {
     console.error(err);

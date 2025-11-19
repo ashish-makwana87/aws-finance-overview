@@ -24,6 +24,18 @@ functions:
       - httpApi:
           path: /auth/login
           method: post
+      - httpApi:
+          path: /admin/stats
+          method: get
+      - httpApi:
+          path: /user/profile
+          method: get
+      - httpApi:
+          path: /user/profile
+          method: put
+      - httpApi:
+          path: /user/profile
+          method: delete
 
 plugins:
   - serverless-dotenv-plugin

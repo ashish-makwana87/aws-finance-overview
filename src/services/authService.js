@@ -3,7 +3,7 @@ import { comparePassword, hashPassword } from "../utils/passwordUtils.js";
 import { signJWT } from "../utils/tokenUtils.js";
 
 export const authService = {
-  signup: async (email, password) => {
+  signup: async (email, password, role = "user") => {
     if (!email || !password) {
       const error = new Error("Email and password are required");
       error.statusCode = 400;
@@ -22,6 +22,7 @@ export const authService = {
     const user = await userRepository.create({
       email,
       password: hashed,
+      role,
       createdAt: new Date(),
     });
 
@@ -49,8 +50,12 @@ export const authService = {
       throw error;
     }
 
-    const token = signJWT({ id: user._id.toString(), email: user.email });
+    const token = signJWT({
+      id: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    });
 
-    return { token };
+    return { message: "Signin success", token };
   },
 };

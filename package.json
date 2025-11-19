@@ -4,6 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "lint": "eslint src --ext .js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon server.js",
     "dev": "npm run server",
@@ -23,6 +24,7 @@
   },
   "description": "",
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.10"
+    "@types/jsonwebtoken": "^9.0.10",
+    "eslint": "^9.39.1"
   }
 }
