@@ -3,7 +3,7 @@ import { error, success } from "../../utils/response.js";
 
 export const loginController = async (event) => {
   try {
-    const body = JSON.parse(event.body);
+    const body = event.validatedBody;
 
     const result = await authService.login(body.email, body.password);
     return success(result);

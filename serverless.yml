@@ -28,6 +28,9 @@ functions:
           path: /admin/stats
           method: get
       - httpApi:
+          path: /admin/profile/{userId}
+          method: put
+      - httpApi:
           path: /user/profile
           method: get
       - httpApi:
