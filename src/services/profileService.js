@@ -2,7 +2,6 @@ import { userProfileRepository } from "../repositories/userProfileRepository.js"
 import { userProfileModel } from "../models/userProfileModel.js";
 
 export const profileService = {
-  
   getProfile: async (userId) => {
     let profile = await userProfileRepository.findByUserId(userId);
 

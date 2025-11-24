@@ -1,7 +1,6 @@
 import { success, error } from "../../utils/response.js";
 import { profileService } from "../../services/profileService.js";
 
-
 export const getProfileController = async (event) => {
   try {
     const userId = event.user.id;
@@ -15,7 +14,7 @@ export const getProfileController = async (event) => {
 export const updateProfileController = async (event) => {
   try {
     const userId = event.user.id;
-    const body = JSON.parse(event.body);
+    const body = event.validatedBody;
 
     const result = await profileService.updateProfile(userId, body);
     return success(result);
