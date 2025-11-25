@@ -3,7 +3,7 @@ import { z } from "zod";
 export const profileSchema = z.object({
   firstName: z
     .string()
-    .min(2, { message: "First name must be at least 2 characters" })
+    .min(2, { message: "First name must be at least 4 characters" })
     .max(30, { message: "First name must be less than 30 characters" })
     .optional(),
   lastName: z
@@ -22,6 +22,6 @@ export const profileSchema = z.object({
   avatar: z.string().url().optional(),
   address: z
     .string()
-    .max(100, { message: "Address must be less than 100 characters" })
+    .max(100, { message: "Address: Max limit 100 characters" })
     .optional(),
 });

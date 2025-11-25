@@ -1,4 +1,4 @@
-import { error } from "../../utils/response.js"
+import { ForbiddenError } from "../../utils/httpErrors.js"
 
 
 
@@ -7,7 +7,7 @@ export const adminOnlyMiddleware = async (event) => {
 
  if(event.user?.role !== 'admin') {
 
-  return error("Forbidden: Admins only", 403)
+  throw new ForbiddenError("Forbidden: Admins only")
  }
 
  return null

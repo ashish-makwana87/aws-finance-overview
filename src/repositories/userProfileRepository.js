@@ -1,7 +1,6 @@
 import { connectToDatabase } from "../libs/db.js";
 
 export const userProfileRepository = {
-  
   findByUserId: async (userId) => {
     const { db } = await connectToDatabase();
     return db.collection("profiles").findOne({ userId });
@@ -14,11 +13,13 @@ export const userProfileRepository = {
 
   update: async (userId, updateData) => {
     const { db } = await connectToDatabase();
-    return db.collection("profiles").updateOne(
-      { userId },
-      { $set: { ...updateData, updatedAt: new Date() } },
-      { upsert: true }
-    );
+    return db
+      .collection("profiles")
+      .updateOne(
+        { userId },
+        { $set: { ...updateData, updatedAt: new Date() } },
+        { upsert: true }
+      );
   },
 
   delete: async (userId) => {
@@ -26,4 +27,3 @@ export const userProfileRepository = {
     return db.collection("profiles").deleteOne({ userId });
   },
 };
-
