@@ -1,14 +1,16 @@
-import { error } from "../../utils/response.js";
+import {
+  ForbiddenError,
+  UnauthenticatedError,
+} from "../../utils/httpErrors.js";
 
 export const allowRoles = (roles = []) => {
- 
   return async (event) => {
     if (!event.user) {
-      return error("Unauthorized", 401);
+      throw new UnauthenticatedError("Unauthorized");
     }
 
     if (!roles.includes(event.user.role)) {
-      return error("Forbidden: insufficient permissions", 403);
+      throw new ForbiddenError("Forbidden: insufficient permissions");
     }
 
     return null;

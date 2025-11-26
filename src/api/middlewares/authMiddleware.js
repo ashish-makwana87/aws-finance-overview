@@ -1,22 +1,24 @@
 import { verifyJWT } from "../../utils/tokenUtils.js";
 import { error } from "../../utils/response.js";
+import { UnauthenticatedError } from "../../utils/httpErrors.js";
 
 export const authMiddleware = async (event) => {
-  try {
+  
     const authHeader = event.headers?.authorization || event.headers?.Authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return error("Unauthorized", 401);
+      throw new UnauthenticatedError("Unauthorized")
     }
 
     const token = authHeader.split(" ")[1];
     const decoded = verifyJWT(token);
+    
+    if(!decoded) {
+      throw new UnauthenticatedError("Invalid or expired token")
+    }
 
     //attaching user data to event
     event.user = decoded;
 
-    return null;  
-  } catch (err) {
-    return error("Invalid or expired token", 401);
-  }
+    return null;
 };

@@ -12,3 +12,4 @@ export const adminRoutes = {
     PUT: [authMiddleware, adminOnlyMiddleware, adminUpdateProfileController],
   },
 };
+

@@ -6,10 +6,14 @@ export function success(data) {
   };
 }
 
-export function error(message, code = 500) {
+export function errorHandler(err) {
+ 
+  const status = err.statusCode || 500; 
+  const errorMessage = err.message || "Something went wrong";
+
   return {
-    statusCode: code,
+    statusCode: status,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ error: message }),
+    body: JSON.stringify({ message: errorMessage}),
   };
 }

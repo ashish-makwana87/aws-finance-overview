@@ -1,20 +1,17 @@
 import { userRepository } from "../repositories/userRepository.js";
+import { BadRequestError, ConflictError, UnauthenticatedError } from "../utils/httpErrors.js";
 import { comparePassword, hashPassword } from "../utils/passwordUtils.js";
 import { signJWT } from "../utils/tokenUtils.js";
 
 export const authService = {
   signup: async (email, password, role = "user") => {
     if (!email || !password) {
-      const error = new Error("Email and password are required");
-      error.statusCode = 400;
-      throw error;
+      throw new BadRequestError("Email and password are required");
     }
 
     const existing = await userRepository.findByEmail(email);
     if (existing) {
-      const error = new Error("Email already exists");
-      error.statusCode = 409;
-      throw error;
+      throw new ConflictError("Email already exists");
     }
 
     const hashed = await hashPassword(password);
@@ -31,23 +28,17 @@ export const authService = {
 
   login: async (email, password) => {
     if (!email || !password) {
-      const error = new Error("Email and password are required");
-      error.statusCode = 400;
-      throw error;
+      throw new BadRequestError("Email and password are required");
     }
 
     const user = await userRepository.findByEmail(email);
     if (!user) {
-      const error = new Error("Invalid email");
-      error.statusCode = 401;
-      throw error;
+      throw new UnauthenticatedError("Invalid email");
     }
 
     const isValid = await comparePassword(password, user.password);
     if (!isValid) {
-      const error = new Error("Invalid password");
-      error.statusCode = 401;
-      throw error;
+      throw new UnauthenticatedError("Invalid password");
     }
 
     const token = signJWT({
