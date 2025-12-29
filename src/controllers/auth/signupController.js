@@ -1,5 +1,5 @@
 import { authService } from "../../services/authService.js";
-import { error, success } from "../../utils/response.js";
+import { success } from "../../utils/response.js";
 
 export const signupController = async (event) => {
     const body = event.validatedBody;

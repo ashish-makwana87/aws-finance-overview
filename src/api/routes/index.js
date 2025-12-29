@@ -2,9 +2,8 @@ import { adminRoutes } from "./admin.routes.js";
 import { authRoutes } from "./auth.routes.js";
 import { userRoutes } from "./user.routes.js";
 
-
 export const routes = {
- ...authRoutes,
- ...adminRoutes,
- ...userRoutes
-}
+  ...authRoutes,
+  ...adminRoutes,
+  ...userRoutes,
+};
