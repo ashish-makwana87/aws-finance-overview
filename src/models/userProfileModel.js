@@ -1,14 +1,11 @@
-
-
 export const userProfileModel = {
-
- defaultProfile: (userId) => ({
+  defaultProfile: (userId) => ({
     userId,
     firstName: "",
     lastName: "",
     phone: "",
     avatar: "",
-    address: "", 
+    address: "",
     createdAt: new Date(),
     updatedAt: new Date(),
   }),

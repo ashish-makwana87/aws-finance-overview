@@ -1,5 +1,4 @@
 import { BadRequestError } from "../../utils/httpErrors.js";
-import { errorHandler } from "../utils/response.js";
 
 export const validate = (schema) => {
   return async (event) => {

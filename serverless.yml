@@ -8,11 +8,20 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: ap-south-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+          Resource:
+            - arn:aws:s3:::aws-user-avatar-ashmakk/*
   environment:
     MONGODB_URI: ${env:MONGODB_URI}
     DB_NAME: ${env:DB_NAME}
     JWT_SECRET: ${env:JWT_SECRET}
     JWT_EXP: ${env:JWT_EXP}
+    AVATAR_BUCKET: ${env:AVATAR_BUCKET}
 
 functions:
   apiLambda:
@@ -39,6 +48,9 @@ functions:
       - httpApi:
           path: /user/profile
           method: delete
+      - httpApi:
+          path: /user/avatar/upload-url
+          method: post
 
 plugins:
   - serverless-dotenv-plugin
