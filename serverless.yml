@@ -14,6 +14,7 @@ provider:
         - Effect: Allow
           Action:
             - s3:PutObject
+            - s3:GetObject
           Resource:
             - arn:aws:s3:::aws-user-avatar-ashmakk/*
   environment:
@@ -24,6 +25,15 @@ provider:
     AVATAR_BUCKET: ${env:AVATAR_BUCKET}
 
 functions:
+  imageResize:
+    handler: src/functions/imageResizeHandler.handler
+    events:
+      - s3:
+          bucket: aws-user-avatar-ashmakk
+          event: s3:ObjectCreated:*
+          existing: true
+          rules:
+            - prefix: avatars/original/
   apiLambda:
     handler: src/api/handler.handler
     events:
