@@ -2,7 +2,7 @@ import { generateUploadURL } from "../utils/s3Utils.js";
 
 export const fileService = {
   createAvatarUpload: async (userId, fileType) => {
-    const key = `avatars/${userId}-${Date.now()}`;
+    const key = `avatars/original/${userId}-${Date.now()}`;
 
     const uploadURL = await generateUploadURL({
       key,
