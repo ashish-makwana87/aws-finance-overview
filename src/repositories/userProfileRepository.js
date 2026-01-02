@@ -26,4 +26,16 @@ export const userProfileRepository = {
     const { db } = await connectToDatabase();
     return db.collection("profiles").deleteOne({ userId });
   },
+  updateAvatarKey: async (userId, avatarKey) => {
+    const { db } = await connectToDatabase();
+    return db.collection("profiles").updateOne(
+      { userId },
+      {
+        $set: {
+          avatarKey,
+          updatedAt: new Date(),
+        },
+      }
+    );
+  },
 };

@@ -1,6 +1,6 @@
 useDotenv: true
 
-org: ashishmakwana
+org: ashishmak
 
 service: aws-api
 
@@ -15,6 +15,7 @@ provider:
           Action:
             - s3:PutObject
             - s3:GetObject
+            - s3:DeleteObject
           Resource:
             - arn:aws:s3:::aws-user-avatar-ashmakk/*
   environment:

@@ -4,37 +4,29 @@ import {
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import sharp from "sharp";
+import { profileService } from "../services/profileService.js";
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 export const handler = async (event) => {
-  console.log("Lambda triggered");
-  console.log("Received records:", event.Records?.length);
 
   for (const record of event.Records) {
     const bucket = record.s3.bucket.name;
     const key = decodeURIComponent(record.s3.object.key);
-
-    console.log("Processing object");
-    console.log("Bucket:", bucket);
-    console.log("Key:", key);
+    
+   const avatarKey = key.replace("avatars/original/", "");
+   const userId = avatarKey.split("/")[0];
 
     if (!key.startsWith("avatars/original/")) {
-      console.log("Skipping non-avatar object");
       continue;
     }
-
+ 
     try {
-      console.log("Downloading image from S3");
-
       const image = await s3.send(
         new GetObjectCommand({ Bucket: bucket, Key: key })
       );
 
       const buffer = Buffer.from(await image.Body.transformToByteArray());
-
-      console.log("Image downloaded. Size (bytes):", buffer.length);
-      console.log("Starting image resize with Sharp");
 
       // resizing and compression
       const optimized = await sharp(buffer)
@@ -45,16 +37,7 @@ export const handler = async (event) => {
         .webp({ quality: 80 })
         .toBuffer();
 
-      console.log(
-        "Image resized successfully. Optimized size (bytes):",
-        optimized.length
-      );
-
-      const optimizedKey = key
-        .replace("avatars/original/", "avatars/optimized/")
-        .concat(".webp");
-
-      console.log("Uploading optimized image to:", optimizedKey);
+      const optimizedKey = `avatars/optimized/${avatarKey}.webp`
 
       await s3.send(
         new PutObjectCommand({
@@ -65,9 +48,8 @@ export const handler = async (event) => {
         })
       );
 
-      console.log("Optimized image upload completed");
+      await profileService.updateAvatarKey(userId, avatarKey);
     } catch (error) {
-      console.error("Error processing image:", error);
       throw error;
     }
   }
