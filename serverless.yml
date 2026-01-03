@@ -71,6 +71,9 @@ functions:
       - httpApi:
           path: /user/avatar/upload-url
           method: post
+      - httpApi:
+          path: /user/deactivate
+          method: post
 
 plugins:
   - serverless-offline

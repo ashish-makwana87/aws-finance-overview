@@ -36,7 +36,7 @@ export const profileService = {
 cleanupOldAvatar: async (userId) => {
   if (!userId) return;
 
-  const profile = await userProfileRepository.getByUserId(userId);
+  const profile = await userProfileRepository.findByUserId(userId);
   if (!profile || !profile.avatarKey) return;
 
   await deleteAvatarObjects(profile.avatarKey);
