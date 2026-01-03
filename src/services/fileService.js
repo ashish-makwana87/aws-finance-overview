@@ -1,16 +1,18 @@
 import { generateUploadURL } from "../utils/s3Utils.js";
+import { profileService } from "./profileService.js";
 
 export const fileService = {
   createAvatarUpload: async (userId, fileType) => {
-    const key = `avatars/original/${userId}-${Date.now()}`;
+    await profileService.cleanupOldAvatar(userId);
+
+    const avatarKey = `${userId}/${Date.now()}`;
+    const s3Key = `avatars/original/${avatarKey}`;
 
     const uploadURL = await generateUploadURL({
-      key,
+      key: s3Key,
       contentType: fileType,
     });
 
-    const publicURL = `https://${process.env.AVATAR_BUCKET}.s3.amazonaws.com/${key}`;
-
-    return { uploadURL, publicURL };
+    return { uploadURL, avatarKey };
   },
 };

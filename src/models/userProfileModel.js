@@ -4,7 +4,7 @@ export const userProfileModel = {
     firstName: "",
     lastName: "",
     phone: "",
-    avatar: "",
+    avatarKey: null,
     address: "",
     createdAt: new Date(),
     updatedAt: new Date(),

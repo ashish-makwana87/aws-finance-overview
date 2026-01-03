@@ -1,7 +1,7 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+useDotenv: true
+
 org: ashishmak
 
-# "service" is the name of this project. This will also be added to your AWS resource names.
 service: aws-api
 
 provider:
@@ -15,6 +15,7 @@ provider:
           Action:
             - s3:PutObject
             - s3:GetObject
+            - s3:DeleteObject
           Resource:
             - arn:aws:s3:::aws-user-avatar-ashmakk/*
   environment:
@@ -24,9 +25,17 @@ provider:
     JWT_EXP: ${env:JWT_EXP}
     AVATAR_BUCKET: ${env:AVATAR_BUCKET}
 
+layers:
+  sharp:
+    path: layer
+    compatibleRuntimes:
+      - nodejs20.x
+
 functions:
   imageResize:
     handler: src/functions/imageResizeHandler.handler
+    layers:
+      - { Ref: SharpLambdaLayer }
     events:
       - s3:
           bucket: aws-user-avatar-ashmakk
@@ -34,6 +43,7 @@ functions:
           existing: true
           rules:
             - prefix: avatars/original/
+
   apiLambda:
     handler: src/api/handler.handler
     events:
@@ -63,5 +73,4 @@ functions:
           method: post
 
 plugins:
-  - serverless-dotenv-plugin
   - serverless-offline
