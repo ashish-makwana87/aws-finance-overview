@@ -20,6 +20,8 @@ export const authService = {
       email,
       password: hashed,
       role,
+      isActive: true,
+      deactivatedAt: null,
       createdAt: new Date(),
     });
 
@@ -30,11 +32,14 @@ export const authService = {
     if (!email || !password) {
       throw new BadRequestError("Email and password are required");
     }
-
+    
     const user = await userRepository.findByEmail(email);
+    
     if (!user) {
       throw new UnauthenticatedError("Invalid email");
-    }
+    } 
+    
+    if (!user.isActive) {throw new UnauthenticatedError("Account is deactivated")}
 
     const isValid = await comparePassword(password, user.password);
     if (!isValid) {
@@ -45,6 +50,7 @@ export const authService = {
       id: user._id.toString(),
       email: user.email,
       role: user.role,
+      isActive: user.isActive,
     });
 
     return { message: "Signin success", token };

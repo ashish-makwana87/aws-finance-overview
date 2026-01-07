@@ -1,4 +1,5 @@
 import { getAvatarUploadURLController } from "../../controllers/user/avatarUploadController.js";
+import { deactivateAccountController } from "../../controllers/user/deactivateAccountController.js";
 import {
   deleteProfileController,
   getProfileController,
@@ -17,4 +18,7 @@ export const userRoutes = {
   "/user/avatar/upload-url": {
     POST: [authMiddleware, getAvatarUploadURLController],
   },
+  "/user/deactivate": {
+  POST: [authMiddleware, deactivateAccountController],
+}
 };
