@@ -1,4 +1,5 @@
 import { connectToDatabase } from "../libs/db.js";
+import { ObjectId } from "mongodb"
 
 export const userRepository = {
   findByEmail: async (email) => {
@@ -14,7 +15,7 @@ export const userRepository = {
   deactivateById: async (userId) => {
   const { db } = await connectToDatabase();
   return db.collection("users").updateOne(
-    { userId },
+    { _id: new ObjectId(userId) },
     {
       $set: {
         isActive: false,
