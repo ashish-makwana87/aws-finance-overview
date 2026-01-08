@@ -1,6 +1,7 @@
 import { userProfileRepository } from "../repositories/userProfileRepository.js";
 import { userProfileModel } from "../models/userProfileModel.js";
 import { deleteAvatarObjects } from "../utils/s3Utils.js";
+import { activityLogger } from "../utils/activityLogger.js";
 
 export const profileService = {
   getProfile: async (userId) => {
@@ -15,7 +16,12 @@ export const profileService = {
   },
 
   updateProfile: async (userId, data) => {
-    await userProfileRepository.update(userId, data);
+
+    const updatedFields = Object.keys(data);
+
+    await userProfileRepository.update(userId, data);    
+    await activityLogger.logProfileUpdate({userId, updatedFields});
+
     return { message: "Profile updated" };
   },
 
@@ -40,5 +46,7 @@ cleanupOldAvatar: async (userId) => {
   if (!profile || !profile.avatarKey) return;
 
   await deleteAvatarObjects(profile.avatarKey);
+
+  await activityLogger.logAvatarDeleted({userId, oldAvatarKey: profile.avatarKey})
 }
 };

@@ -1,6 +1,6 @@
 useDotenv: true
 
-org: ashishmak
+org: ashishmakwana
 
 service: aws-api
 

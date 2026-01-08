@@ -4,3 +4,9 @@ node_modules
 # Environment variables
 .env
 
+# Keeping lambda layer dependencies
+!layer/nodejs/node_modules/
+!layer/nodejs/node_modules/**
+
+# exclude binaries not needed at runtime
+layer/nodejs/node_modules/.bin/

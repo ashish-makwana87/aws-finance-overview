@@ -15,7 +15,7 @@ export const handler = async (event) => {
     const key = decodeURIComponent(record.s3.object.key);
     
    const avatarKey = key.replace("avatars/original/", "");
-   const userId = avatarKey.split("/")[0];
+   const userId = avatarKey.split("-")[0];
 
     if (!key.startsWith("avatars/original/")) {
       continue;
