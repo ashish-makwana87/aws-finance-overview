@@ -30,7 +30,7 @@ export const deleteAvatarObjects = async (avatarKey) => {
     }),
   ];
 
-  // Does not throw error if one fails to execute
+  // Does not throw error if one fails to execute 
   await Promise.allSettled(
     deleteCommands.map((cmd) => s3.send(cmd))
   );
