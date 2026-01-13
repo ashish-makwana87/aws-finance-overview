@@ -1,19 +1,49 @@
-import { userProfileModel } from "../../src/models/userProfileModel.js";
-import { userProfileRepository } from "../../src/repositories/userProfileRepository.js";
-import { profileService } from "../../src/services/profileService.js";
-import { activityLogger } from "../../src/utils/activityLogger.js";
-import { deleteAvatarObjects } from "../../src/utils/s3Utils.js";
+import { jest } from "@jest/globals";
 
-activityLogger
+jest.unstable_mockModule("../../src/repositories/userProfileRepository.js", () => ({
+  userProfileRepository: {
+    findByUserId: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    updateAvatarKey: jest.fn(),
+  },
+}));
 
-jest.mock("../../src/repositories/userProfileRepository.js");
-jest.mock("../../src/models/userProfileModel.js", () => ({
+jest.unstable_mockModule("../../src/models/userProfileModel.js", () => ({
   userProfileModel: {
     defaultProfile: jest.fn(),
   },
 }));
 
-jest.mock("../../src/utils/s3Utils.js");
+jest.unstable_mockModule("../../src/utils/s3Utils.js", () => ({
+  deleteAvatarObjects: jest.fn(),
+}));
+
+jest.unstable_mockModule("../../src/utils/activityLogger.js", () => ({
+  activityLogger: {
+    logProfileUpdate: jest.fn(),
+    logAvatarDeleted: jest.fn(),
+  },
+}));
+
+
+const { profileService } = await import(
+  "../../src/services/profileService.js"
+);
+const { userProfileRepository } = await import(
+  "../../src/repositories/userProfileRepository.js"
+);
+const { userProfileModel } = await import(
+  "../../src/models/userProfileModel.js"
+);
+const { deleteAvatarObjects } = await import(
+  "../../src/utils/s3Utils.js"
+);
+const { activityLogger } = await import(
+  "../../src/utils/activityLogger.js"
+);
+
 
 describe("profileService", () => {
 
