@@ -1,9 +1,20 @@
+import { storageConfig } from "../config/storageConfig.js";
 import { activityLogger } from "../utils/activityLogger.js";
+import { BadRequestError } from "../utils/httpErrors.js";
 import { generateUploadURL } from "../utils/s3Utils.js";
 import { profileService } from "./profileService.js";
 
 export const fileService = {
   createAvatarUpload: async (userId, fileType) => {
+
+    if(storageConfig.provider !== "s3") {
+      throw new BadRequestError("Unsupported storage provider")
+    }
+    
+    if (!storageConfig.avatar.allowedTypes.includes(fileType)) {
+      throw new BadRequestError(`Unsupported file type. Allowed file types: ${storageConfig.avatar.allowedTypes.join(", ")}`)
+    }
+
     await profileService.cleanupOldAvatar(userId);
 
     const avatarKey = `${userId}-${Date.now()}`;
@@ -12,10 +23,11 @@ export const fileService = {
     const uploadURL = await generateUploadURL({
       key: s3Key,
       contentType: fileType,
+      maxSizeMB: storageConfig.avatar.maxSizeMB,
     });
-   
-   await activityLogger.logAvatarUploadInitiated({userId, avatarKey})
+  
+  await activityLogger.logAvatarUploadInitiated({userId, avatarKey})
 
-    return { uploadURL, avatarKey };
+  return { uploadURL, avatarKey };
   },
 };
