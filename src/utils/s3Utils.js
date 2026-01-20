@@ -3,11 +3,12 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 
-export const generateUploadURL = async ({ key, contentType }) => {
+export const generateUploadURL = async ({ key, contentType, maxSizeMB}) => {
   const command = new PutObjectCommand({
     Bucket: process.env.AVATAR_BUCKET,
     Key: key,
     ContentType: contentType,
+    ContentLength: maxSizeMB * 1024 * 1024,
   });
 
   return getSignedUrl(s3, command, { expiresIn: 60 });
