@@ -11,16 +11,14 @@ export const authMiddleware = async (event) => {
 
   const token = authHeader.split(" ")[1];
   const decoded = verifyJWT(token);
-  
-  console.log("verifyJWT is mocked:", verifyJWT.toString());
 
   if (!decoded) {
     throw new UnauthenticatedError("Invalid or expired token");
   }
 
   if (!decoded.isActive) {
-  throw new UnauthenticatedError("Account is deactivated");
-}
+    throw new UnauthenticatedError("Account is deactivated");
+  }
 
   //attaching user data to event
   event.user = decoded;

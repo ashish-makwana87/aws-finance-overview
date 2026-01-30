@@ -1,9 +1,10 @@
 import { jest } from "@jest/globals";
-import { connectTestDb, clearTestDb, closeTestDb } from "./setupTestDb.js";
+import { connectToDatabase, closeDatabase } from "../../src/libs/db.js";
 
 jest.resetModules();
 
 jest.unstable_mockModule("../../src/utils/tokenUtils.js", () => ({
+  signJWT: jest.fn(() => "mock-jwt-token"),
   verifyJWT: () => ({
     id: "test-user-123",
     role: "user",
@@ -17,15 +18,18 @@ const { handler } = await import("../../src/api/handler.js");
 let db;
 
 beforeAll(async () => {
-  db = await connectTestDb();
+  ({ db } = await connectToDatabase());
 });
 
 beforeEach(async () => {
-  await clearTestDb();
+  const collections = await db.collections();
+  for (const col of collections) {
+    await col.deleteMany({});
+  }
 });
 
 afterAll(async () => {
-  await closeTestDb();
+  await closeDatabase();
 });
 
 const buildEvent = ({ method, path, body, auth = true }) => ({
@@ -53,7 +57,7 @@ describe("Profile API integration tests", () => {
     expect(response.statusCode).toBe(200);
 
     const body = JSON.parse(response.body);
-    expect(body.data.userId).toBe("test-user-123");
+    expect(body.userId).toBe("test-user-123");
   });
 
   it("PUT /user/profile updates profile data", async () => {
@@ -73,12 +77,14 @@ describe("Profile API integration tests", () => {
     expect(response.statusCode).toBe(200);
 
     const body = JSON.parse(response.body);
-    expect(body.data.message).toBe("Profile updated");
+    expect(body.message).toBe("Profile updated");
 
     const profileInDb = await db
       .collection("profiles")
       .findOne({ userId: "test-user-123" });
 
+    console.log(profileInDb);
+    expect(profileInDb).not.toBeNull();
     expect(profileInDb.firstName).toBe("Ashish");
   });
 
@@ -101,12 +107,12 @@ describe("Profile API integration tests", () => {
     expect(response.statusCode).toBe(200);
 
     const body = JSON.parse(response.body);
-    expect(body.data.message).toBe("Profile deleted");
+    expect(body.message).toBe("Profile deleted");
 
     const profile = await db
       .collection("profiles")
       .findOne({ userId: "test-user-123" });
-
+    console.log(profile);
     expect(profile).toBeNull();
   });
 });
