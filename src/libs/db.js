@@ -7,6 +7,10 @@ export async function connectToDatabase() {
   if (cachedClient && cachedDb) {
     return { client: cachedClient, db: cachedDb };
   }
+  
+  if (!process.env.MONGODB_URI) {
+  throw new Error("MONGODB_URI is not set");
+  }
 
   const client = new MongoClient(process.env.MONGODB_URI);
 

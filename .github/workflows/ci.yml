@@ -24,6 +24,11 @@ jobs:
         run: npm install
 
       - name: Run test suite 
+        env:
+          NODE_ENV: test
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          DB_NAME: AwsFinanceApp
+          TEST_DB_NAME: AwsFinanceTest
         run: npm test
 
       # Try building/packaging ONLY if serverless is available
