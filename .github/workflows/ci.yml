@@ -23,10 +23,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Your "test" script ALWAYS fails intentionally,
-      # so we keep it optional to avoid CI breaking.
-      - name: Skip tests (none implemented yet)
-        run: echo "No tests implemented yet. Skipping."
+      - name: Run test suite 
+        env:
+          NODE_ENV: test
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          DB_NAME: AwsFinanceApp
+          TEST_DB_NAME: AwsFinanceTest
+        run: npm test
 
       # Try building/packaging ONLY if serverless is available
       - name: Try serverless package (optional)

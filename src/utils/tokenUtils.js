@@ -1,18 +1,19 @@
-import jwt from "jsonwebtoken"; 
-
+import jwt from "jsonwebtoken";
 
 export const signJWT = (payload) => {
-  
- const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXP,})
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined");
+  }
 
- return token;
-}
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXP ?? "1d",
+  });
 
+  return token;
+};
 
 export const verifyJWT = (token) => {
- 
- const verifiedToken = jwt.verify(token, process.env.JWT_SECRET)
- 
- return verifiedToken; 
-}
+  const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
 
+  return verifiedToken;
+};

@@ -17,8 +17,8 @@ export const authMiddleware = async (event) => {
   }
 
   if (!decoded.isActive) {
-  throw new UnauthenticatedError("Account is deactivated");
-}
+    throw new UnauthenticatedError("Account is deactivated");
+  }
 
   //attaching user data to event
   event.user = decoded;
