@@ -12,15 +12,20 @@ export const profileService = {
       await userProfileRepository.create(profile);
     }
 
+    if (profile.avatarKey) {
+      profile.avatarUrl = `${process.env.CLOUDFRONT_URL}/avatars/optimized/${profile.avatarKey}.webp`;
+    } else {
+      profile.avatarUrl = null;
+    }
+    
     return profile;
   },
 
   updateProfile: async (userId, data) => {
-
     const updatedFields = Object.keys(data);
 
-    await userProfileRepository.update(userId, data);    
-    await activityLogger.logProfileUpdate({userId, updatedFields});
+    await userProfileRepository.update(userId, data);
+    await activityLogger.logProfileUpdate({ userId, updatedFields });
 
     return { message: "Profile updated" };
   },
@@ -31,22 +36,22 @@ export const profileService = {
   },
 
   updateAvatarKey: async (userId, avatarKey) => {
-  if (!userId || !avatarKey) return;
+    if (!userId || !avatarKey) return;
 
-  await userProfileRepository.updateAvatarKey(
-    userId,
-    avatarKey,
-  );
-},
+    await userProfileRepository.updateAvatarKey(userId, avatarKey);
+  },
 
-cleanupOldAvatar: async (userId) => {
-  if (!userId) return;
+  cleanupOldAvatar: async (userId) => {
+    if (!userId) return;
 
-  const profile = await userProfileRepository.findByUserId(userId);
-  if (!profile || !profile.avatarKey) return;
+    const profile = await userProfileRepository.findByUserId(userId);
+    if (!profile || !profile.avatarKey) return;
 
-  await deleteAvatarObjects(profile.avatarKey);
+    await deleteAvatarObjects(profile.avatarKey);
 
-  await activityLogger.logAvatarDeleted({userId, oldAvatarKey: profile.avatarKey})
-}
+    await activityLogger.logAvatarDeleted({
+      userId,
+      oldAvatarKey: profile.avatarKey,
+    });
+  },
 };

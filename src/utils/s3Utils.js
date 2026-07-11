@@ -1,14 +1,17 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 
-export const generateUploadURL = async ({ key, contentType, maxSizeMB}) => {
+export const generateUploadURL = async ({ key, contentType, maxSizeMB }) => {
   const command = new PutObjectCommand({
     Bucket: process.env.AVATAR_BUCKET,
     Key: key,
     ContentType: contentType,
-    ContentLength: maxSizeMB * 1024 * 1024,
   });
 
   return getSignedUrl(s3, command, { expiresIn: 60 });
@@ -31,8 +34,6 @@ export const deleteAvatarObjects = async (avatarKey) => {
     }),
   ];
 
-  // Does not throw error if one fails to execute 
-  await Promise.allSettled(
-    deleteCommands.map((cmd) => s3.send(cmd))
-  );
+  // Does not throw error if one fails to execute
+  await Promise.allSettled(deleteCommands.map((cmd) => s3.send(cmd)));
 };

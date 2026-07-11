@@ -1,6 +1,6 @@
 useDotenv: true
 
-org: ashishmakwana
+org: ashishmak
 
 service: aws-api
 
@@ -24,6 +24,7 @@ provider:
     JWT_SECRET: ${env:JWT_SECRET}
     JWT_EXP: ${env:JWT_EXP}
     AVATAR_BUCKET: ${env:AVATAR_BUCKET}
+    CLOUDFRONT_URL: ${env:CLOUDFRONT_URL}
     STORAGE_PROVIDER: ${env:STORAGE_PROVIDER}
     AVATAR_MAX_SIZE_MB: ${env:AVATAR_MAX_SIZE_MB}
     AVATAR_ALLOWED_TYPES: ${env:AVATAR_ALLOWED_TYPES}
