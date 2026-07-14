@@ -1,12 +1,10 @@
-useDotenv: true
-
 org: ashishmak
 
 service: aws-api
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   region: ap-south-1
   iam:
     role:
@@ -18,6 +16,7 @@ provider:
             - s3:DeleteObject
           Resource:
             - arn:aws:s3:::aws-user-avatar-ashmakk/*
+
   environment:
     MONGODB_URI: ${env:MONGODB_URI}
     DB_NAME: ${env:DB_NAME}
@@ -33,7 +32,7 @@ layers:
   sharp:
     path: layer
     compatibleRuntimes:
-      - nodejs20.x
+      - nodejs22.x
 
 functions:
   imageResize:
@@ -41,12 +40,9 @@ functions:
     layers:
       - { Ref: SharpLambdaLayer }
     events:
-      - s3:
-          bucket: aws-user-avatar-ashmakk
-          event: s3:ObjectCreated:*
-          existing: true
-          rules:
-            - prefix: avatars/original/
+      - sqs:
+          arn: arn:aws:sqs:ap-south-1:${aws:accountId}:avatar-processing-dev
+          batchSize: 1
 
   apiLambda:
     handler: src/api/handler.handler
