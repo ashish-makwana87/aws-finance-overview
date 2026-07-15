@@ -28,6 +28,6 @@ export const fileService = {
   
   await activityLogger.logAvatarUploadInitiated({userId, avatarKey})
 
-  return { uploadURL, avatarKey };
+  return { uploadURL, key: s3Key };
   },
 };

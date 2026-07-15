@@ -2,6 +2,7 @@ import { userProfileRepository } from "../repositories/userProfileRepository.js"
 import { userProfileModel } from "../models/userProfileModel.js";
 import { deleteAvatarObjects } from "../utils/s3Utils.js";
 import { activityLogger } from "../utils/activityLogger.js";
+import { publishImageProcessingJob } from "../utils/sqsUtils.js";
 
 export const profileService = {
   getProfile: async (userId) => {
@@ -17,7 +18,7 @@ export const profileService = {
     } else {
       profile.avatarUrl = null;
     }
-    
+
     return profile;
   },
 
@@ -52,6 +53,14 @@ export const profileService = {
     await activityLogger.logAvatarDeleted({
       userId,
       oldAvatarKey: profile.avatarKey,
+    });
+  },
+
+  uploadComplete: async (userId, key) => {
+    await publishImageProcessingJob({
+      bucket: process.env.AVATAR_BUCKET,
+      key,
+      userId,
     });
   },
 };

@@ -16,6 +16,11 @@ provider:
             - s3:DeleteObject
           Resource:
             - arn:aws:s3:::aws-user-avatar-ashmakk/*
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource:
+            - arn:aws:sqs:ap-south-1:${aws:accountId}:avatar-processing-dev
 
   environment:
     MONGODB_URI: ${env:MONGODB_URI}
@@ -24,6 +29,7 @@ provider:
     JWT_EXP: ${env:JWT_EXP}
     AVATAR_BUCKET: ${env:AVATAR_BUCKET}
     CLOUDFRONT_URL: ${env:CLOUDFRONT_URL}
+    SQS_QUEUE_URL: ${env:SQS_QUEUE_URL}
     STORAGE_PROVIDER: ${env:STORAGE_PROVIDER}
     AVATAR_MAX_SIZE_MB: ${env:AVATAR_MAX_SIZE_MB}
     AVATAR_ALLOWED_TYPES: ${env:AVATAR_ALLOWED_TYPES}
