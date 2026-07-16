@@ -9,14 +9,9 @@ import { profileService } from "../services/profileService.js";
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 const processRecord = async (record) => {
-  const s3Event = JSON.parse(record.body);
-  const s3Record = s3Event.Records[0];
-
-  const bucket = s3Record.s3.bucket.name;
-  const key = decodeURIComponent(s3Record.s3.object.key);
+  const { bucket, key, userId } = JSON.parse(record.body);
 
   const avatarKey = key.replace("avatars/original/", "");
-  const [userId] = avatarKey.split("-");
 
   console.log("Processing image", {
     bucket,
