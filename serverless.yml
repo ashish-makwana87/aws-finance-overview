@@ -21,6 +21,13 @@ provider:
             - sqs:SendMessage
           Resource:
             - arn:aws:sqs:ap-south-1:${aws:accountId}:avatar-processing-dev
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/ProfileCache
 
   environment:
     MONGODB_URI: ${env:MONGODB_URI}
@@ -30,6 +37,7 @@ provider:
     AVATAR_BUCKET: ${env:AVATAR_BUCKET}
     CLOUDFRONT_URL: ${env:CLOUDFRONT_URL}
     SQS_QUEUE_URL: ${env:SQS_QUEUE_URL}
+    PROFILE_CACHE_TABLE: ${env:PROFILE_CACHE_TABLE}
     STORAGE_PROVIDER: ${env:STORAGE_PROVIDER}
     AVATAR_MAX_SIZE_MB: ${env:AVATAR_MAX_SIZE_MB}
     AVATAR_ALLOWED_TYPES: ${env:AVATAR_ALLOWED_TYPES}

@@ -1,4 +1,4 @@
-import { profileService } from "../../services/profileService";
+import { profileService } from "../../services/profileService.js";
 import { success } from "../../utils/response.js";
 
 export const uploadCompleteController = async (event) => {
