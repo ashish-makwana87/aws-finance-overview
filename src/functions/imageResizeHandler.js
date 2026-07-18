@@ -5,6 +5,7 @@ import {
 } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 import { profileService } from "../services/profileService.js";
+import { logger } from "../utils/logger.js";
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 
@@ -13,9 +14,14 @@ const processRecord = async (record) => {
 
   const avatarKey = key.replace("avatars/original/", "");
 
-  console.log("Processing image", {
-    bucket,
-    key,
+  logger.info({
+    event: "IMAGE_PROCESSING_STARTED",
+    message: "Started processing uploaded image",
+    service: "image-resize-handler",
+    metadata: {
+      bucket,
+      key,
+    },
   });
 
   if (!key.startsWith("avatars/original/")) {
@@ -51,19 +57,28 @@ const processRecord = async (record) => {
 
     await profileService.updateAvatarKey(userId, avatarKey);
 
-    console.log("Image processed successfully", {
-      bucket,
-      originalKey: key,
-      optimizedKey,
-      userId,
+    logger.info({
+      event: "IMAGE_RESIZED",
+      message: "Image resized successfully",
+      service: "image-resize-handler",
+      metadata: {
+        bucket,
+        originalKey: key,
+        optimizedKey,
+        userId,
+      },
     });
   } catch (error) {
-    // For cloud Watch log details.
-    console.error("Image processing failed", {
-      bucket,
-      key,
-      error: error.message,
-      stack: error.stack,
+    logger.error({
+      event: "IMAGE_RESIZE_FAILED",
+      message: "Image resize failed",
+      service: "image-resize-handler",
+      metadata: {
+        bucket,
+        key,
+        error: error.message,
+        stack: error.stack,
+      },
     });
 
     throw error;
