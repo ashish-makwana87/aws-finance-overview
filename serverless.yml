@@ -28,11 +28,15 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/ProfileCache
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:aws-serverless-project/dev*
 
   environment:
     MONGODB_URI: ${env:MONGODB_URI}
     DB_NAME: ${env:DB_NAME}
-    JWT_SECRET: ${env:JWT_SECRET}
     JWT_EXP: ${env:JWT_EXP}
     AVATAR_BUCKET: ${env:AVATAR_BUCKET}
     CLOUDFRONT_URL: ${env:CLOUDFRONT_URL}
@@ -41,6 +45,7 @@ provider:
     STORAGE_PROVIDER: ${env:STORAGE_PROVIDER}
     AVATAR_MAX_SIZE_MB: ${env:AVATAR_MAX_SIZE_MB}
     AVATAR_ALLOWED_TYPES: ${env:AVATAR_ALLOWED_TYPES}
+    SECRET_NAME: aws-serverless-project/dev
 
 layers:
   sharp:

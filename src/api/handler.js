@@ -1,9 +1,11 @@
+import { loadSecrets } from "../config/secrets.js";
 import { NotFoundError } from "../utils/httpErrors.js";
 import { errorHandler } from "../utils/response.js";
 import { routes } from "./routes/index.js";
 
 export const handler = async (event) => {
   try {
+    await loadSecrets(); 
     const path = event.requestContext.http.path;
     const httpMethod = event.requestContext.http.method.toUpperCase();
 
