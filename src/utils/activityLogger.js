@@ -1,23 +1,28 @@
 import { profileUpdateLogRepository } from "../repositories/profileUpdateLogRepository.js";
-
+import { logger } from "../utils/logger.js";
 
 export const activityLogger = {
- logProfileUpdate: async ({ userId, updatedFields }) => {
-  const logEntry = {
-    event: "PROFILE_UPDATED",
-    userId,
-    updatedFields,
-    timestamp: new Date(),
-  };
+  logProfileUpdate: async ({ userId, updatedFields }) => {
+    const logEntry = {
+      event: "PROFILE_UPDATED",
+      userId,
+      updatedFields,
+      timestamp: new Date(),
+    };
 
-  // CloudWatch log
-  console.log(JSON.stringify(logEntry));
+    // CloudWatch log
+    logger.info({
+      event: "ACTIVITY_LOG_CREATED",
+      message: "Activity log created",
+      service: "activity-logger",
+      metadata: logEntry,
+    });
 
-  // DB collection
-  await profileUpdateLogRepository.create(logEntry);
-},
+    // DB collection
+    await profileUpdateLogRepository.create(logEntry);
+  },
 
-logAvatarUploadInitiated: async ({ userId, avatarKey }) => {
+  logAvatarUploadInitiated: async ({ userId, avatarKey }) => {
     const logEntry = {
       event: "AVATAR_UPLOAD_INITIATED",
       userId,
@@ -25,7 +30,15 @@ logAvatarUploadInitiated: async ({ userId, avatarKey }) => {
       timestamp: new Date(),
     };
 
-    console.log(JSON.stringify(logEntry));
+    // CloudWatch log
+    logger.info({
+      event: "ACTIVITY_LOG_CREATED",
+      message: "Activity log created",
+      service: "activity-logger",
+      metadata: logEntry,
+    });
+
+    // DB collection
     await profileUpdateLogRepository.create(logEntry);
   },
 
@@ -37,7 +50,15 @@ logAvatarUploadInitiated: async ({ userId, avatarKey }) => {
       timestamp: new Date(),
     };
 
-    console.log(JSON.stringify(logEntry));
+    // CloudWatch log
+    logger.info({
+      event: "ACTIVITY_LOG_CREATED",
+      message: "Activity log created",
+      service: "activity-logger",
+      metadata: logEntry,
+    });
+
+    // DB collection
     await profileUpdateLogRepository.create(logEntry);
   },
-}
+};

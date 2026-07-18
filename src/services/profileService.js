@@ -12,7 +12,6 @@ export const profileService = {
     let profile = await profileCacheRepository.get(userId);
 
     if (profile) {
-    console.log("Profile Cache HIT");
 
     if (profile.avatarKey) {
       profile.avatarUrl = `${process.env.CLOUDFRONT_URL}/avatars/optimized/${profile.avatarKey}.webp`;
@@ -23,9 +22,6 @@ export const profileService = {
     return profile;
     }
     
-    console.log(profile);
-    console.log("Profile Cache MISS");
-
     // Fetch from MongoDB 
     profile = await userProfileRepository.findByUserId(userId);
 
