@@ -10,6 +10,7 @@ import { logger } from "../utils/logger.js";
 const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 const processRecord = async (record) => {
+
   const { bucket, key, userId } = JSON.parse(record.body);
 
   const avatarKey = key.replace("avatars/original/", "");

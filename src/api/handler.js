@@ -5,14 +5,14 @@ import { routes } from "./routes/index.js";
 
 export const handler = async (event) => {
   try {
-    await loadSecrets(); 
+    await loadSecrets();
     const path = event.requestContext.http.path;
     const httpMethod = event.requestContext.http.method.toUpperCase();
 
     //Routing event/request to designated controller
     const handlers = routes[path]?.[httpMethod];
     if (!handlers) {
-      throw new NotFoundError("Route not found");
+      throw new NotFoundError("Requested route not found");
     }
 
     // handlersList is always an array
