@@ -1,14 +1,28 @@
 import { jest } from "@jest/globals";
 
-jest.unstable_mockModule("../../src/repositories/userProfileRepository.js", () => ({
-  userProfileRepository: {
-    findByUserId: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    updateAvatarKey: jest.fn(),
-  },
-}));
+jest.unstable_mockModule(
+  "../../src/repositories/profileCacheRepository.js",
+  () => ({
+    profileCacheRepository: {
+      get: jest.fn().mockResolvedValue(null),
+      put: jest.fn().mockResolvedValue(undefined),
+      delete: jest.fn().mockResolvedValue(undefined),
+    },
+  }),
+);
+
+jest.unstable_mockModule(
+  "../../src/repositories/userProfileRepository.js",
+  () => ({
+    userProfileRepository: {
+      findByUserId: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      updateAvatarKey: jest.fn(),
+    },
+  }),
+);
 
 jest.unstable_mockModule("../../src/models/userProfileModel.js", () => ({
   userProfileModel: {
@@ -27,33 +41,22 @@ jest.unstable_mockModule("../../src/utils/activityLogger.js", () => ({
   },
 }));
 
-
-const { profileService } = await import(
-  "../../src/services/profileService.js"
-);
-const { userProfileRepository } = await import(
-  "../../src/repositories/userProfileRepository.js"
-);
-const { userProfileModel } = await import(
-  "../../src/models/userProfileModel.js"
-);
-const { deleteAvatarObjects } = await import(
-  "../../src/utils/s3Utils.js"
-);
-const { activityLogger } = await import(
-  "../../src/utils/activityLogger.js"
-);
-
+const { profileService } = await import("../../src/services/profileService.js");
+const { userProfileRepository } =
+  await import("../../src/repositories/userProfileRepository.js");
+const { userProfileModel } =
+  await import("../../src/models/userProfileModel.js");
+const { deleteAvatarObjects } = await import("../../src/utils/s3Utils.js");
+const { activityLogger } = await import("../../src/utils/activityLogger.js");
 
 describe("profileService", () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-// ===========================
-//  getProfile test
-// ===========================
+  // ===========================
+  //  getProfile test
+  // ===========================
 
   describe("getProfile", () => {
     it("returns existing profile if found", async () => {
@@ -84,40 +87,48 @@ describe("profileService", () => {
     });
   });
 
-// ===========================
-//  updateProfile test
-// ===========================
+  // ===========================
+  //  updateProfile test
+  // ===========================
 
- 
   describe("updateProfile", () => {
     it("updates profile and logs updated fields", async () => {
       const userId = "user-3";
+      const profile = { userId, firstName: "Ashish" };
       const data = { firstName: "Ashish", phone: "123" };
 
+      userProfileRepository.findByUserId.mockResolvedValue(profile);
       userProfileRepository.update.mockResolvedValue({});
       activityLogger.logProfileUpdate.mockResolvedValue();
 
       const result = await profileService.updateProfile(userId, data);
 
-      expect(userProfileRepository.update)
-        .toHaveBeenCalledWith(userId, data);
+      expect(userProfileRepository.update).toHaveBeenCalledWith(userId, data);
 
-      expect(activityLogger.logProfileUpdate)
-        .toHaveBeenCalledWith({
-          userId,
-          updatedFields: ["firstName", "phone"],
-        });
+      expect(activityLogger.logProfileUpdate).toHaveBeenCalledWith({
+        userId,
+        updatedFields: ["firstName", "phone"],
+      });
 
       expect(result).toEqual({ message: "Profile updated" });
     });
+
+    it("throws NotFoundError when profile does not exist", async () => {
+      const userId = "user-3";
+      const profile = { userId, firstName: "Ashish" };
+
+      userProfileRepository.findByUserId.mockResolvedValue(null);
+
+      await expect(profileService.updateProfile(userId, profile)).rejects.toThrow(
+        "Profile not found",
+      );
+    });
   });
 
+  // ===========================
+  //  deleteProfile test
+  // ===========================
 
-// ===========================
-//  deleteProfile test
-// ===========================
-
-  
   describe("deleteProfile", () => {
     it("deletes profile", async () => {
       const userId = "user-4";
@@ -131,10 +142,9 @@ describe("profileService", () => {
     });
   });
 
-// ===========================
-//  updateAvatarKey test
-// ===========================
-  
+  // ===========================
+  //  updateAvatarKey test
+  // ===========================
 
   describe("updateAvatarKey", () => {
     it("updates avatar key when valid inputs are provided", async () => {
@@ -145,8 +155,10 @@ describe("profileService", () => {
 
       await profileService.updateAvatarKey(userId, avatarKey);
 
-      expect(userProfileRepository.updateAvatarKey)
-        .toHaveBeenCalledWith(userId, avatarKey);
+      expect(userProfileRepository.updateAvatarKey).toHaveBeenCalledWith(
+        userId,
+        avatarKey,
+      );
     });
 
     it("does nothing when userId or avatarKey is missing", async () => {
@@ -156,11 +168,11 @@ describe("profileService", () => {
     });
   });
 
-// ===========================
-//  cleanupOldAvatar test
-// ===========================
+  // ===========================
+  //  cleanupOldAvatar test
+  // ===========================
 
-describe("cleanupOldAvatar", () => {
+  describe("cleanupOldAvatar", () => {
     it("deletes old avatar and logs deletion", async () => {
       const userId = "user-6";
       const profile = { avatarKey: "old-avatar" };
@@ -171,14 +183,12 @@ describe("cleanupOldAvatar", () => {
 
       await profileService.cleanupOldAvatar(userId);
 
-      expect(deleteAvatarObjects)
-        .toHaveBeenCalledWith("old-avatar");
+      expect(deleteAvatarObjects).toHaveBeenCalledWith("old-avatar");
 
-      expect(activityLogger.logAvatarDeleted)
-        .toHaveBeenCalledWith({
-          userId,
-          oldAvatarKey: "old-avatar",
-        });
+      expect(activityLogger.logAvatarDeleted).toHaveBeenCalledWith({
+        userId,
+        oldAvatarKey: "old-avatar",
+      });
     });
 
     it("does nothing if profile does not exist", async () => {

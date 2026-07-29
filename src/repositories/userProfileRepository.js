@@ -17,8 +17,7 @@ export const userProfileRepository = {
       .collection("profiles")
       .updateOne(
         { userId },
-        { $set: { userId, ...updateData, updatedAt: new Date() } },
-        { upsert: true },
+        { $set: {...updateData, updatedAt: new Date() } },
       );
   },
 
