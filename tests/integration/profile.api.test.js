@@ -13,7 +13,30 @@ jest.unstable_mockModule("../../src/utils/tokenUtils.js", () => ({
   }),
 }));
 
+jest.unstable_mockModule(
+  "../../src/repositories/profileCacheRepository.js",
+  () => ({
+    profileCacheRepository: {
+      get: jest.fn().mockResolvedValue(null),
+      put: jest.fn().mockResolvedValue(undefined),
+      delete: jest.fn().mockResolvedValue(undefined),
+    },
+  }),
+);
+
+jest.unstable_mockModule("../../src/config/secrets.js", () => ({
+  loadSecrets: jest.fn().mockResolvedValue({
+    jwtSecret: "test-secret",
+  }),
+  getSecrets: jest.fn(() => ({
+    jwtSecret: "test-secret",
+  })),
+}));
+
 const { handler } = await import("../../src/api/handler.js");
+
+const { userProfileModel } =
+  await import("../../src/models/userProfileModel.js");
 
 let db;
 
@@ -23,6 +46,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   const collections = await db.collections();
+
   for (const col of collections) {
     await col.deleteMany({});
   }
@@ -51,8 +75,6 @@ describe("Profile API integration tests", () => {
     });
 
     const response = await handler(event);
-    console.log("STATUS:", response.statusCode);
-    console.log("BODY:", response.body);
 
     expect(response.statusCode).toBe(200);
 
@@ -66,13 +88,16 @@ describe("Profile API integration tests", () => {
       path: "/user/profile",
       body: {
         firstName: "Ashish",
-        phone: "1234567890",
+        phone: "8888855555",
       },
     });
 
+    // Arrange
+    await db
+      .collection("profiles")
+      .insertOne(userProfileModel.defaultProfile("test-user-123"));
+
     const response = await handler(event);
-    console.log("STATUS:", response.statusCode);
-    console.log("BODY:", response.body);
 
     expect(response.statusCode).toBe(200);
 
@@ -83,7 +108,6 @@ describe("Profile API integration tests", () => {
       .collection("profiles")
       .findOne({ userId: "test-user-123" });
 
-    console.log(profileInDb);
     expect(profileInDb).not.toBeNull();
     expect(profileInDb.firstName).toBe("Ashish");
   });
@@ -101,8 +125,6 @@ describe("Profile API integration tests", () => {
     });
 
     const response = await handler(event);
-    console.log("STATUS:", response.statusCode);
-    console.log("BODY:", response.body);
 
     expect(response.statusCode).toBe(200);
 
@@ -112,7 +134,7 @@ describe("Profile API integration tests", () => {
     const profile = await db
       .collection("profiles")
       .findOne({ userId: "test-user-123" });
-    console.log(profile);
+  
     expect(profile).toBeNull();
   });
 });

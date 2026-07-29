@@ -8,9 +8,7 @@
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "server": "nodemon server.js",
     "dev": "npm run server",
-    "start": "node server.js",
-    "deploy": "serverless deploy",
-    "offline": "serverless offline"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",

@@ -4,25 +4,24 @@ import { deleteAvatarObjects } from "../utils/s3Utils.js";
 import { activityLogger } from "../utils/activityLogger.js";
 import { publishImageProcessingJob } from "../utils/sqsUtils.js";
 import { profileCacheRepository } from "../repositories/profileCacheRepository.js";
+import { NotFoundError } from "../utils/httpErrors.js";
 
 export const profileService = {
   getProfile: async (userId) => {
-
-    // Checking cache 
+    // Checking cache
     let profile = await profileCacheRepository.get(userId);
 
     if (profile) {
+      if (profile.avatarKey) {
+        profile.avatarUrl = `${process.env.CLOUDFRONT_URL}/avatars/optimized/${profile.avatarKey}.webp`;
+      } else {
+        profile.avatarUrl = null;
+      }
 
-    if (profile.avatarKey) {
-      profile.avatarUrl = `${process.env.CLOUDFRONT_URL}/avatars/optimized/${profile.avatarKey}.webp`;
-    } else {
-      profile.avatarUrl = null;
+      return profile;
     }
 
-    return profile;
-    }
-    
-    // Fetch from MongoDB 
+    // Fetch from MongoDB
     profile = await userProfileRepository.findByUserId(userId);
 
     if (!profile) {
@@ -30,7 +29,7 @@ export const profileService = {
       await userProfileRepository.create(profile);
     }
 
-    // Store in cache 
+    // Store in cache
     await profileCacheRepository.put(profile);
 
     if (profile.avatarKey) {
@@ -45,9 +44,14 @@ export const profileService = {
   updateProfile: async (userId, data) => {
     const updatedFields = Object.keys(data);
 
+    const currentProfile = await userProfileRepository.findByUserId(userId);
+    if (!currentProfile) {
+      throw new NotFoundError("Profile not found");
+    }
+
     await userProfileRepository.update(userId, data);
 
-    // Invalidate cache 
+    // Invalidate cache
     await profileCacheRepository.delete(userId);
 
     await activityLogger.logProfileUpdate({ userId, updatedFields });
@@ -58,7 +62,7 @@ export const profileService = {
   deleteProfile: async (userId) => {
     await userProfileRepository.delete(userId);
 
-    // Remove cache 
+    // Remove cache
     await profileCacheRepository.delete(userId);
 
     return { message: "Profile deleted" };
@@ -69,7 +73,7 @@ export const profileService = {
 
     await userProfileRepository.updateAvatarKey(userId, avatarKey);
 
-    // Remove cache 
+    // Remove cache
     await profileCacheRepository.delete(userId);
   },
 
