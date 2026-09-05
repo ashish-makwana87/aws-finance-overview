@@ -1,5 +1,5 @@
 import { profileService } from "../../services/profileService.js";
-import { errorHandler, success } from "../../utils/response.js";
+import { success } from "../../utils/response.js";
 
 export const adminUpdateProfileController = async (event) => {
   const targetUserId = event.pathParameters.userId;
